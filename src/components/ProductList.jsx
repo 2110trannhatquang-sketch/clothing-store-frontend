@@ -202,6 +202,130 @@ function ProductList({
 
     }, []);
 
+// ========================================================
+// SCROLL REVEAL ANIMATION
+// ========================================================
+
+useEffect(() => {
+
+    const elements =
+  document.querySelectorAll(
+    ".intro, .category-card, .collection-header, .product-card-wrap, .brand-number, .brand-content, .brand-year, .footer-cta"
+);
+
+    if (!elements.length) {
+        return;
+    }
+
+    // Trình duyệt cũ không hỗ trợ IntersectionObserver
+    if (!("IntersectionObserver" in window)) {
+
+        elements.forEach((element) => {
+            element.classList.add("is-visible");
+        });
+
+        return;
+    }
+
+    const observer =
+        new IntersectionObserver(
+            (entries) => {
+
+                entries.forEach((entry) => {
+
+                    if (entry.isIntersecting) {
+
+                        entry.target.classList.add(
+                            "is-visible"
+                        );
+
+                        observer.unobserve(
+                            entry.target
+                        );
+                    }
+
+                });
+
+            },
+            {
+                threshold: 0.15,
+                rootMargin:
+                    "0px 0px -60px 0px",
+            }
+        );
+
+
+   let productIndex = 0;
+
+elements.forEach((element) => {
+
+    element.classList.add(
+        "reveal-item"
+    );
+
+    let delay = 0;
+
+    if (
+        element.classList.contains(
+            "category-card"
+        )
+    ) {
+        delay = 120;
+    }
+
+    if (
+        element.classList.contains(
+            "product-card-wrap"
+        )
+    ) {
+        delay =
+            (productIndex % 4) * 120;
+
+        productIndex += 1;
+    }
+if (
+    element.classList.contains(
+        "brand-number"
+    )
+) {
+    delay = 0;
+}
+
+if (
+    element.classList.contains(
+        "brand-content"
+    )
+) {
+    delay = 180;
+}
+
+if (
+    element.classList.contains(
+        "brand-year"
+    )
+) {
+    delay = 360;
+}
+    element.style.setProperty(
+        "--reveal-delay",
+        `${delay}ms`
+    );
+
+    observer.observe(
+        element
+    );
+});
+
+    return () => {
+
+        observer.disconnect();
+
+    };
+
+}, [
+    category,
+    search,
+]);
 
     // ========================================================
     // NORMALIZE
@@ -694,71 +818,56 @@ function ProductList({
             {!category &&
                 !search.trim() && (
 
-                <section className="hero">
+               <section className="hero luxury-hero">
 
-                    <img
-                        src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=2000&q=90"
-                        alt="BOUTIQUE Collection"
-                    />
+  <div className="hero-media">
+    <img
+      className="hero-image"
+      src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=2000&q=90"
+      alt="BOUTIQUE Collection"
+    />
+  </div>
 
+  <div className="hero-overlay"></div>
 
-                    <div className="hero-overlay">
-                    </div>
+  <div className="hero-content">
 
+    <p className="hero-kicker">
+      MAISON COUTURE
+    </p>
 
-                    <div className="hero-content">
+    <h1 className="hero-title">
 
-                        <p className="hero-label">
-                            BOUTIQUE · 2026
-                        </p>
+      <span className="hero-line">
+        <span>BỘ SƯU TẬP</span>
+      </span>
 
+      <span className="hero-line">
+        <span>MỚI</span>
+      </span>
 
-                        <h1>
-                            NEW
-                            <br />
-                            COLLECTION
-                        </h1>
+    </h1>
 
+    <p className="hero-subtitle">
+      Phong cách hiện đại · Tinh tế · Thanh lịch
+    </p>
 
-                        <div className="hero-description">
+    <Link
+      to="/?category=new"
+      className="hero-cta"
+    >
+      <span>KHÁM PHÁ BỘ SƯU TẬP</span>
+      <span className="hero-arrow">→</span>
+    </Link>
 
-                            Thiết kế dành cho phong cách
-                            hiện đại, tối giản và khác biệt.
+  </div>
 
-                        </div>
+  <div className="hero-scroll">
+    <span>CUỘN XUỐNG</span>
+    <div className="hero-scroll-line"></div>
+  </div>
 
-
-                        <div className="hero-actions">
-
-                            <Link
-                                to="/?category=men"
-                            >
-                                KHÁM PHÁ NAM
-                            </Link>
-
-
-                            <Link
-                                to="/?category=women"
-                            >
-                                KHÁM PHÁ NỮ
-                            </Link>
-
-                        </div>
-
-                    </div>
-
-
-                    <div className="hero-scroll">
-
-                        SCROLL TO DISCOVER
-
-                        <span>
-                        </span>
-
-                    </div>
-
-                </section>
-
+</section>
             )}
 
 
@@ -1228,172 +1337,539 @@ function ProductList({
 
 
                 /* =============================================
-                   HERO
-                ============================================= */
+   HERO - LUXURY ANIMATION
+============================================= */
 
-                .hero {
-                    position: relative;
+.hero {
+    position: relative;
 
-                    width: 100%;
+    width: 100%;
+    height: calc(100vh - 78px);
+    min-height: 650px;
 
-                    height:
-                        calc(
-                            100vh -
-                            78px
-                        );
+    overflow: hidden;
 
-                    min-height: 650px;
-
-                    overflow: hidden;
-
-                    background: #111;
-                }
+    background: #111;
+}
 
 
-                .hero img {
-                    width: 100%;
-                    height: 100%;
+/* ================= MEDIA ================= */
 
-                    object-fit: cover;
+.hero-media {
+    position: absolute;
+    inset: 0;
 
-                    display: block;
-                }
+    overflow: hidden;
+}
 
+.hero-image {
+    width: 100%;
+    height: 100%;
 
-                .hero-overlay {
-                    position: absolute;
+    object-fit: cover;
+    display: block;
 
-                    inset: 0;
+    opacity: 0;
 
-                    background:
-                        linear-gradient(
-                            180deg,
-                            rgba(0,0,0,.08),
-                            rgba(0,0,0,.15),
-                            rgba(0,0,0,.55)
-                        );
-                }
+    transform: scale(1.14);
 
+    animation:
+        heroImageReveal
+        1.7s
+        cubic-bezier(.16, 1, .3, 1)
+        forwards,
 
-                .hero-content {
-                    position: absolute;
-
-                    left: 6%;
-                    bottom: 95px;
-
-                    max-width: 760px;
-
-                    color: #fff;
-                }
+        heroSlowZoom
+        12s
+        ease-out
+        1.7s
+        forwards;
+}
 
 
-                .hero-label {
-                    margin:
-                        0 0 22px;
+/* ================= OVERLAY ================= */
 
-                    font-size: 10px;
+.hero-overlay {
+    position: absolute;
+    inset: 0;
 
-                    letter-spacing: 5px;
-                }
+    z-index: 1;
 
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, .08) 0%,
+            rgba(0, 0, 0, .12) 40%,
+            rgba(0, 0, 0, .65) 100%
+        );
 
-                .hero-content h1 {
-                    margin: 0;
+    opacity: 0;
 
-                    font-size:
-                        clamp(
-                            58px,
-                            8vw,
-                            120px
-                        );
-
-                    line-height: .88;
-
-                    font-weight: 300;
-
-                    letter-spacing: -2px;
-                }
-
-
-                .hero-description {
-                    max-width: 420px;
-
-                    margin-top: 30px;
-
-                    color:
-                        rgba(
-                            255,
-                            255,
-                            255,
-                            .85
-                        );
-
-                    font-size: 13px;
-
-                    line-height: 1.8;
-                }
+    animation:
+        heroOverlayReveal
+        1.2s
+        ease
+        .2s
+        forwards;
+}
 
 
-                .hero-actions {
-                    display: flex;
+/* ================= CONTENT ================= */
 
-                    gap: 35px;
+.hero-content {
+    position: absolute;
 
-                    margin-top: 32px;
-                }
+    z-index: 2;
 
+    left: 6%;
+    bottom: 90px;
 
-                .hero-actions a {
-                    padding-bottom: 7px;
+    width: min(850px, 85%);
 
-                    color: #fff;
-
-                    border-bottom:
-                        1px solid #fff;
-
-                    text-decoration: none;
-
-                    font-size: 10px;
-
-                    letter-spacing: 2px;
-                }
+    color: #fff;
+}
 
 
-                .hero-scroll {
-                    position: absolute;
+/* ================= KICKER ================= */
 
-                    right: 45px;
-                    bottom: 50px;
+.hero-kicker {
+    margin: 0 0 22px;
 
-                    display: flex;
+    font-size: 10px;
 
-                    align-items: center;
+    letter-spacing: 6px;
 
-                    gap: 15px;
+    opacity: 0;
 
-                    color: #fff;
+    transform: translateY(20px);
 
-                    font-size: 8px;
-
-                    letter-spacing: 2px;
-
-                    transform:
-                        rotate(90deg);
-
-                    transform-origin:
-                        right center;
-                }
+    animation:
+        heroFadeUp
+        .9s
+        cubic-bezier(.16, 1, .3, 1)
+        .45s
+        forwards;
+}
 
 
-                .hero-scroll span {
-                    width: 45px;
-                    height: 1px;
+/* ================= TITLE ================= */
 
-                    display: block;
+.hero-title {
+    margin: 0;
 
-                    background: #fff;
-                }
+color: #fff;
 
+    font-size:
+        clamp(
+            58px,
+            8vw,
+            118px
+        );
+
+    line-height: .88;
+
+    font-weight: 300;
+
+    letter-spacing: -2px;
+}
+
+.hero-line {
+    display: block;
+
+    overflow: hidden;
+
+    padding-bottom: 8px;
+}
+
+.hero-line > span {
+    display: block;
+
+    transform: translateY(120%);
+
+    animation:
+        heroTitleReveal
+        1.05s
+        cubic-bezier(.16, 1, .3, 1)
+        forwards;
+}
+
+.hero-line:nth-child(1) > span {
+    animation-delay: .65s;
+}
+
+.hero-line:nth-child(2) > span {
+    animation-delay: .78s;
+}
+
+
+/* ================= SUBTITLE ================= */
+
+.hero-subtitle {
+    max-width: 500px;
+
+    margin:
+        30px 0
+        28px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            .85
+        );
+
+    font-size: 13px;
+
+    line-height: 1.8;
+
+    letter-spacing: 1.5px;
+
+    opacity: 0;
+
+    transform: translateY(20px);
+
+    animation:
+        heroFadeUp
+        .9s
+        cubic-bezier(.16, 1, .3, 1)
+        1s
+        forwards;
+}
+
+
+/* ================= CTA ================= */
+
+.hero-cta {
+    position: relative;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding:
+        10px 0;
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-size: 10px;
+
+    letter-spacing: 2.5px;
+
+    opacity: 0;
+
+    transform: translateY(20px);
+
+    animation:
+        heroFadeUp
+        .9s
+        cubic-bezier(.16, 1, .3, 1)
+        1.2s
+        forwards;
+}
+
+.hero-cta::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: 3px;
+
+    width: 100%;
+    height: 1px;
+
+    background: #fff;
+
+    transform: scaleX(1);
+
+    transform-origin: left;
+
+    transition:
+        transform
+        .4s
+        cubic-bezier(.16, 1, .3, 1);
+}
+
+.hero-cta:hover::after {
+    transform: scaleX(0);
+}
+
+.hero-arrow {
+    display: inline-block;
+
+    font-size: 16px;
+
+    transition:
+        transform
+        .35s ease;
+}
+
+.hero-cta:hover
+.hero-arrow {
+    transform:
+        translateX(7px);
+}
+
+
+/* ================= SCROLL ================= */
+
+.hero-scroll {
+    position: absolute;
+
+    z-index: 2;
+
+    right: 35px;
+    bottom: 35px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 12px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            .75
+        );
+
+    opacity: 0;
+
+    animation:
+        heroFadeIn
+        1s
+        ease
+        1.6s
+        forwards;
+}
+
+.hero-scroll span {
+    width: auto;
+    height: auto;
+
+    background: none;
+
+    font-size: 8px;
+
+    letter-spacing: 3px;
+
+    writing-mode:
+        vertical-rl;
+
+    transform:
+        rotate(180deg);
+}
+
+.hero-scroll-line {
+    position: relative;
+
+    width: 1px;
+    height: 65px;
+
+    overflow: hidden;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .25
+        );
+}
+
+.hero-scroll-line::after {
+    content: "";
+
+    position: absolute;
+
+    top: -100%;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: #fff;
+
+    animation:
+        heroScroll
+        2s
+        ease-in-out
+        infinite;
+}
+
+
+/* ================= KEYFRAMES ================= */
+
+@keyframes heroImageReveal {
+
+    from {
+        opacity: 0;
+
+        transform:
+            scale(1.18);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            scale(1.08);
+    }
+
+}
+
+
+@keyframes heroSlowZoom {
+
+    from {
+        transform:
+            scale(1.08);
+    }
+
+    to {
+        transform:
+            scale(1);
+    }
+
+}
+
+
+@keyframes heroOverlayReveal {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+}
+
+
+@keyframes heroTitleReveal {
+
+    from {
+        transform:
+            translateY(120%);
+    }
+
+    to {
+        transform:
+            translateY(0);
+    }
+
+}
+
+
+@keyframes heroFadeUp {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+
+}
+
+
+@keyframes heroFadeIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+}
+
+
+@keyframes heroScroll {
+
+    0% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(200%);
+    }
+
+    100% {
+        transform:
+            translateY(200%);
+    }
+
+}
+                /* =============================================
+   SCROLL REVEAL
+============================================= */
+
+.reveal-item {
+    opacity: 0;
+
+    transform:
+        translateY(55px);
+
+    filter:
+        blur(4px);
+
+    transition:
+        opacity .9s cubic-bezier(.16, 1, .3, 1),
+        transform 1s cubic-bezier(.16, 1, .3, 1),
+        filter .9s ease;
+
+    transition-delay:
+        var(--reveal-delay, 0ms);
+
+    will-change:
+        opacity,
+        transform;
+}
+
+.reveal-item.is-visible {
+    opacity: 1;
+
+    transform:
+        translateY(0);
+
+    filter:
+        blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .reveal-item {
+        opacity: 1;
+
+        transform: none;
+
+        filter: none;
+
+        transition: none;
+    }
+
+}
 
                 /* =============================================
                    INTRO
@@ -1480,47 +1956,79 @@ function ProductList({
 
 
                 .category-card img {
-                    position: absolute;
+    position: absolute;
+    inset: 0;
 
-                    inset: 0;
+    width: 100%;
+    height: 100%;
 
-                    width: 100%;
-                    height: 100%;
+    object-fit: cover;
 
-                    object-fit: cover;
+    transform: scale(1);
 
-                    transition:
-                        transform .8s ease;
-                }
+    transition:
+        transform
+        1.2s
+        cubic-bezier(.16, 1, .3, 1);
+}
 
-
-                .category-card:hover img {
-                    transform:
-                        scale(1.035);
-                }
-
-
-                .category-overlay {
-                    position: absolute;
-
-                    inset: 0;
-
-                    background:
-                        linear-gradient(
-                            to top,
-                            rgba(0,0,0,.55),
-                            rgba(0,0,0,.05)
-                        );
-                }
+.category-card:hover img {
+    transform:
+        scale(1.07);
+}
 
 
-                .category-content {
-                    position: absolute;
+               .category-overlay {
+    position: absolute;
+    inset: 0;
 
-                    left: 45px;
-                    right: 45px;
-                    bottom: 45px;
-                }
+    background:
+        linear-gradient(
+            to top,
+            rgba(0,0,0,.58),
+            rgba(0,0,0,.04)
+        );
+
+    transition:
+        background
+        .7s
+        ease;
+}
+
+.category-card:hover
+.category-overlay {
+    background:
+        linear-gradient(
+            to top,
+            rgba(0,0,0,.72),
+            rgba(0,0,0,.08)
+        );
+}
+
+
+              .category-content {
+    position: absolute;
+
+    left: 45px;
+    right: 45px;
+    bottom: 45px;
+
+    z-index: 2;
+
+    transform:
+        translateY(0);
+
+    transition:
+        transform
+        .7s
+        cubic-bezier(.16, 1, .3, 1);
+}
+
+.category-card:hover
+.category-content {
+    transform:
+        translateY(-12px);
+}
 
 
                 .category-content span {
@@ -1546,13 +2054,49 @@ function ProductList({
 
 
                 .category-content p {
-                    margin: 0;
+    position: relative;
 
-                    font-size: 9px;
+    display: inline-block;
 
-                    letter-spacing: 2px;
-                }
+    margin: 0;
 
+    padding-bottom: 7px;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+}
+
+.category-content p::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 1px;
+
+    background: #fff;
+
+    transform:
+        scaleX(0);
+
+    transform-origin:
+        left;
+
+    transition:
+        transform
+        .5s
+        cubic-bezier(.16, 1, .3, 1);
+}
+
+.category-card:hover
+.category-content p::after {
+    transform:
+        scaleX(1);
+}
 
                 /* =============================================
                    COLLECTION
@@ -1687,54 +2231,64 @@ function ProductList({
                 ============================================= */
 
                 .wishlist-heart {
-                    position: absolute;
+    position: absolute;
 
-                    top: 12px;
-                    right: 12px;
+    top: 12px;
+    right: 12px;
 
-                    z-index: 20;
+    z-index: 20;
 
-                    width: 38px;
-                    height: 38px;
+    width: 40px;
+    height: 40px;
 
-                    display: flex;
+    display: flex;
 
-                    align-items: center;
+    align-items: center;
+    justify-content: center;
 
-                    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, .5);
 
-                    border: none;
+    border-radius: 50%;
 
-                    background:
-                        rgba(
-                            255,
-                            255,
-                            255,
-                            .94
-                        );
+    background: rgba(255, 255, 255, .82);
 
-                    color: #111;
+    backdrop-filter: blur(10px);
 
-                    cursor: pointer;
+    color: #111;
 
-                    font-size: 21px;
+    cursor: pointer;
 
-                    transition:
-                        all .2s ease;
-                }
+    font-size: 20px;
 
-
-                .wishlist-heart:hover {
-                    transform:
-                        scale(1.08);
-                }
+    transition:
+        transform .35s cubic-bezier(.16, 1, .3, 1),
+        background .35s ease,
+        color .35s ease,
+        border-color .35s ease;
+}
 
 
-                .wishlist-heart.active {
-                    background: #111;
+               .wishlist-heart:hover {
+    transform:
+        scale(1.12);
 
-                    color: #fff;
-                }
+    background: #111;
+
+    color: #fff;
+
+    border-color: #111;
+}
+
+               .wishlist-heart.active {
+    background: #111;
+
+    color: #fff;
+
+    border-color: #111;
+
+    transform:
+        scale(1);
+}
 
 
                 /* =============================================
@@ -1755,24 +2309,28 @@ function ProductList({
                 }
 
 
-                .product-image img {
-                    width: 100%;
-                    height: 100%;
+              .product-image img {
+    width: 100%;
+    height: 100%;
 
-                    object-fit: cover;
+    object-fit: cover;
 
-                    display: block;
+    display: block;
 
-                    transition:
-                        transform .7s ease;
-                }
+    transform:
+        scale(1);
 
+    transition:
+        transform
+        1.1s
+        cubic-bezier(.16, 1, .3, 1);
+}
 
-                .product-card:hover
-                .product-image img {
-                    transform:
-                        scale(1.04);
-                }
+.product-card:hover
+.product-image img {
+    transform:
+        scale(1.065);
+}
 
 
                 .product-number {
@@ -1799,34 +2357,43 @@ function ProductList({
 
 
                 .product-hover {
-                    position: absolute;
+    position: absolute;
 
-                    left: 12px;
-                    right: 12px;
-                    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
 
-                    padding:
-                        13px;
+    padding:
+        15px;
 
-                    background:
-                        rgba(
-                            255,
-                            255,
-                            255,
-                            .94
-                        );
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .96
+        );
 
-                    text-align: center;
+    backdrop-filter:
+        blur(8px);
 
-                    opacity: 0;
+    text-align: center;
 
-                    transform:
-                        translateY(10px);
+    opacity: 0;
 
-                    transition:
-                        all .3s ease;
-                }
+    transform:
+        translateY(18px);
 
+    transition:
+        opacity
+        .45s
+        cubic-bezier(.16, 1, .3, 1),
+
+        transform
+        .45s
+        cubic-bezier(.16, 1, .3, 1);
+}
+                    
 
                 .product-hover span {
                     font-size: 9px;
@@ -1886,22 +2453,33 @@ function ProductList({
 
 
                 .product-card:hover
-                .product-top > span {
-                    opacity: 1;
+.product-top > span {
+    opacity: 1;
 
-                    transform:
-                        translateX(3px);
-                }
+    transform:
+        translateX(7px);
+}
 
 
-                .product-info h3 {
-                    margin:
-                        10px 0 8px;
+               .product-info h3 {
+    margin:
+        10px 0 8px;
 
-                    font-size: 13px;
+    font-size: 13px;
 
-                    font-weight: 500;
-                }
+    font-weight: 500;
+
+    transition:
+        transform
+        .35s
+        cubic-bezier(.16, 1, .3, 1);
+}
+
+.product-card:hover
+.product-info h3 {
+    transform:
+        translateX(4px);
+}
 
 
                 .price {
@@ -2011,6 +2589,8 @@ function ProductList({
 
                 .brand-content h2 {
                     margin: 0;
+
+                    color: #fff;
 
                     font-size:
                         clamp(
@@ -2241,17 +2821,33 @@ function ProductList({
                     }
 
 
-                    .hero-content {
-                        left: 25px;
-                        right: 25px;
-                        bottom: 65px;
-                    }
+                   .hero-content {
+    left: 20px;
+    right: 20px;
+    bottom: 60px;
+
+    width: auto;
+
+    text-align: center;
+}
 
 
                     .hero-content h1 {
                         font-size: 52px;
                     }
+.hero-subtitle {
+    max-width: 260px;
 
+    margin:
+        22px auto
+        24px;
+
+    font-size: 10px;
+
+    line-height: 1.7;
+
+    letter-spacing: .7px;
+}
 
                     .hero-scroll {
                         display: none;
@@ -2350,7 +2946,15 @@ function ProductList({
                     }
 
                 }
+@media (max-width: 360px) {
 
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: 45px;
+    }
+
+}
+    
             `}</style>
 
         </div>
